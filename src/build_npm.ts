@@ -3,23 +3,23 @@ import { build, emptyDir } from "https://deno.land/x/dnt@0.37.0/mod.ts";
 await emptyDir("./npm");
 
 await build({
-  entryPoints: ["./mod.ts"],
+  entryPoints: ["./src/index.ts"],
   outDir: "./npm",
   shims: {
     deno: true,
   },
   package: {
-    name: "is-42",
+    name: "scrap-ai",
     version: Deno.args[0],
     description:
-      "Boolean function that returns whether or not parameter is the number 42",
+      "Scrap AI is a package that scrapes a website and returns the content",
     license: "MIT",
     repository: {
       type: "git",
-      url: "git+https://github.com/",
+      url: "git+https://github.com/matovu-farid/scrap-npm-package.git",
     },
     bugs: {
-      url: "https://github.com/",
+      url: "https://github.com/matovu-farid/scrap-npm-package/issues",
     },
   },
   postBuild() {
