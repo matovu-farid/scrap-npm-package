@@ -6,13 +6,23 @@ A lightweight TypeScript library for asynchronous web scraping with customizable
 
 ```bash
 # NPM
-npm install web-scraping-helper
+npm install scrap-ai
 
 # Yarn
-yarn add web-scraping-helper
+yarn add scrap-ai
 
 # Deno
-import { ScrapeClient } from "https://deno.land/x/web_scraping_helper/mod.ts";
+import { ScrapeClient } from "https://deno.land/x/scrap_ai/mod.ts";
+```
+
+Then import and use:
+
+```typescript
+// ESM/TypeScript
+import { ScrapeClient } from "scrap-ai";
+
+// CommonJS
+const { ScrapeClient } = require("scrap-ai");
 ```
 
 ## Features
@@ -28,7 +38,7 @@ import { ScrapeClient } from "https://deno.land/x/web_scraping_helper/mod.ts";
 The library provides a `ScrapeClient` class for initiating web scraping operations and verifying webhook callbacks:
 
 ```typescript
-import { ScrapeClient } from "web-scraping-helper";
+import { ScrapeClient } from "scrap-ai";
 
 // Initialize the client with your API key
 const scrapeClient = new ScrapeClient(process.env.SCRAP_API_KEY);
@@ -96,7 +106,7 @@ Here's a simple example of how to handle the callback response using Express:
 
 ```typescript
 import express from "express";
-import { ScrapeClient } from "web-scraping-helper";
+import { ScrapeClient } from "scrap-ai";
 
 const app = express();
 app.use(express.json());
