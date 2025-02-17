@@ -1,5 +1,6 @@
 import axios from "axios";
 import crypto from "crypto";
+import { z } from "zod";
 /**
  * Options for verifying webhook signatures
  */
@@ -14,23 +15,33 @@ export interface WebhookVerificationOptions {
   /** Maximum age of webhook in milliseconds (default: 5 minutes) */
   maxAge?: number;
 }
+
+const WebhookBodySchema = z.object({
+  url: z.string().url(),
+  results: z.string(),
+  timestamp: z.number(),
+});
+export { WebhookBodySchema };
+
+type WebhookBody = z.infer<typeof WebhookBodySchema>;
+
 export class ScrapeClient {
   constructor(private readonly apiKey: string) {}
   async scrape(url: string, prompt: string, callbackUrl: string) {
     try {
-    const response = await axios.post(
-      "https://yfcb5ugk4m.execute-api.af-south-1.amazonaws.com/prod",
-      {
-        url,
-        prompt,
-        callbackUrl,
-      },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": this.apiKey,
+      const response = await axios.post(
+        "https://yfcb5ugk4m.execute-api.af-south-1.amazonaws.com/prod",
+        {
+          url,
+          prompt,
+          callbackUrl,
         },
-      }
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": this.apiKey,
+          },
+        }
       );
       return response.data;
     } catch (error) {
@@ -75,6 +86,18 @@ export class ScrapeClient {
     } catch {
       return false;
     }
+  }
+
+  /**
+   * Parses and validates the webhook body
+   *
+   * @param body The raw webhook body as a string
+   * @returns Parsed and validated webhook body
+   * @throws ZodError if the body is invalid
+   */
+  parseWebhookBody(body: string): WebhookBody {
+    const parsed = JSON.parse(body);
+    return WebhookBodySchema.parse(parsed);
   }
 }
 

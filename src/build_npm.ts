@@ -21,6 +21,9 @@ await build({
     bugs: {
       url: "https://github.com/matovu-farid/scrap-npm-package/issues",
     },
+    dependencies: {
+      axios: "^1.7.9",
+    },
   },
   postBuild() {
     Deno.copyFileSync("LICENSE", "npm/LICENSE");

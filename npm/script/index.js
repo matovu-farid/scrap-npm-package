@@ -3,9 +3,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ScrapeClient = void 0;
+exports.ScrapeClient = exports.WebhookBodySchema = void 0;
 const axios_1 = __importDefault(require("axios"));
 const crypto_1 = __importDefault(require("crypto"));
+const zod_1 = require("zod");
+const WebhookBodySchema = zod_1.z.object({
+    url: zod_1.z.string().url(),
+    results: zod_1.z.string(),
+    timestamp: zod_1.z.number(),
+});
+exports.WebhookBodySchema = WebhookBodySchema;
 class ScrapeClient {
     constructor(apiKey) {
         Object.defineProperty(this, "apiKey", {
@@ -64,6 +71,17 @@ class ScrapeClient {
         catch {
             return false;
         }
+    }
+    /**
+     * Parses and validates the webhook body
+     *
+     * @param body The raw webhook body as a string
+     * @returns Parsed and validated webhook body
+     * @throws ZodError if the body is invalid
+     */
+    parseWebhookBody(body) {
+        const parsed = JSON.parse(body);
+        return WebhookBodySchema.parse(parsed);
     }
 }
 exports.ScrapeClient = ScrapeClient;

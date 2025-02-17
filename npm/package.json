@@ -2,7 +2,7 @@
   "module": "./esm/index.js",
   "main": "./script/index.js",
   "name": "scrap-ai",
-  "version": "0.0.4",
+  "version": "0.0.7",
   "description": "Scrap AI is a package that scrapes a website and returns the content",
   "license": "MIT",
   "repository": {
@@ -11,6 +11,9 @@
   },
   "bugs": {
     "url": "https://github.com/matovu-farid/scrap-npm-package/issues"
+  },
+  "dependencies": {
+    "axios": "^1.7.9"
   },
   "exports": {
     ".": {

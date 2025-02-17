@@ -1,5 +1,12 @@
 import axios from "axios";
 import crypto from "crypto";
+import { z } from "zod";
+const WebhookBodySchema = z.object({
+    url: z.string().url(),
+    results: z.string(),
+    timestamp: z.number(),
+});
+export { WebhookBodySchema };
 export class ScrapeClient {
     constructor(apiKey) {
         Object.defineProperty(this, "apiKey", {
@@ -58,6 +65,17 @@ export class ScrapeClient {
         catch {
             return false;
         }
+    }
+    /**
+     * Parses and validates the webhook body
+     *
+     * @param body The raw webhook body as a string
+     * @returns Parsed and validated webhook body
+     * @throws ZodError if the body is invalid
+     */
+    parseWebhookBody(body) {
+        const parsed = JSON.parse(body);
+        return WebhookBodySchema.parse(parsed);
     }
 }
 //  Example usage with Express:
