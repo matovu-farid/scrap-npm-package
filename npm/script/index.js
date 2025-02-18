@@ -3,16 +3,45 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ScrapeClient = exports.WebhookBodySchema = void 0;
+exports.ScrapeClient = exports.isScrapedEvent = exports.isLinksEvent = exports.webHookSchema = exports.scrapedEventWebHookSchema = exports.linksEventWebHookSchema = exports.scrapedSchema = exports.linksSchema = void 0;
 const axios_1 = __importDefault(require("axios"));
 const crypto_1 = __importDefault(require("crypto"));
 const zod_1 = require("zod");
-const WebhookBodySchema = zod_1.z.object({
-    url: zod_1.z.string().url(),
-    results: zod_1.z.string(),
-    timestamp: zod_1.z.number(),
+exports.linksSchema = zod_1.z.object({
+    type: zod_1.z.literal("links"),
+    data: zod_1.z.object({
+        links: zod_1.z.array(zod_1.z.string()),
+    }),
 });
-exports.WebhookBodySchema = WebhookBodySchema;
+exports.scrapedSchema = zod_1.z.object({
+    type: zod_1.z.literal("scraped"),
+    data: zod_1.z.object({
+        url: zod_1.z.string(),
+        results: zod_1.z.string(),
+    }),
+});
+exports.linksEventWebHookSchema = zod_1.z.object({
+    webhook: zod_1.z.string(),
+    data: exports.linksSchema,
+    headers: zod_1.z.record(zod_1.z.string(), zod_1.z.string()),
+});
+exports.scrapedEventWebHookSchema = zod_1.z.object({
+    webhook: zod_1.z.string(),
+    data: exports.scrapedSchema,
+    headers: zod_1.z.record(zod_1.z.string(), zod_1.z.string()),
+});
+exports.webHookSchema = zod_1.z.union([
+    exports.linksEventWebHookSchema,
+    exports.scrapedEventWebHookSchema,
+]);
+const isLinksEvent = (event) => {
+    return event.data.type === "links";
+};
+exports.isLinksEvent = isLinksEvent;
+const isScrapedEvent = (event) => {
+    return event.data.type === "scraped";
+};
+exports.isScrapedEvent = isScrapedEvent;
 class ScrapeClient {
     constructor(apiKey) {
         Object.defineProperty(this, "apiKey", {
@@ -22,6 +51,13 @@ class ScrapeClient {
             value: apiKey
         });
     }
+    /**
+     * Scrape a website
+     * @param url The URL of the website to scrape
+     * @param prompt The prompt to use for the scrape
+     * @param callbackUrl The URL to send the scrape results to
+     * @returns The scrape results
+     */
     async scrape(url, prompt, callbackUrl) {
         try {
             const response = await axios_1.default.post("https://yfcb5ugk4m.execute-api.af-south-1.amazonaws.com/prod", {
@@ -81,7 +117,7 @@ class ScrapeClient {
      */
     parseWebhookBody(body) {
         const parsed = JSON.parse(body);
-        return WebhookBodySchema.parse(parsed);
+        return exports.webHookSchema.parse(parsed);
     }
 }
 exports.ScrapeClient = ScrapeClient;

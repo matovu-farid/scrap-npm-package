@@ -1,12 +1,39 @@
 import axios from "axios";
 import crypto from "crypto";
 import { z } from "zod";
-const WebhookBodySchema = z.object({
-    url: z.string().url(),
-    results: z.string(),
-    timestamp: z.number(),
+export const linksSchema = z.object({
+    type: z.literal("links"),
+    data: z.object({
+        links: z.array(z.string()),
+    }),
 });
-export { WebhookBodySchema };
+export const scrapedSchema = z.object({
+    type: z.literal("scraped"),
+    data: z.object({
+        url: z.string(),
+        results: z.string(),
+    }),
+});
+export const linksEventWebHookSchema = z.object({
+    webhook: z.string(),
+    data: linksSchema,
+    headers: z.record(z.string(), z.string()),
+});
+export const scrapedEventWebHookSchema = z.object({
+    webhook: z.string(),
+    data: scrapedSchema,
+    headers: z.record(z.string(), z.string()),
+});
+export const webHookSchema = z.union([
+    linksEventWebHookSchema,
+    scrapedEventWebHookSchema,
+]);
+export const isLinksEvent = (event) => {
+    return event.data.type === "links";
+};
+export const isScrapedEvent = (event) => {
+    return event.data.type === "scraped";
+};
 export class ScrapeClient {
     constructor(apiKey) {
         Object.defineProperty(this, "apiKey", {
@@ -16,6 +43,13 @@ export class ScrapeClient {
             value: apiKey
         });
     }
+    /**
+     * Scrape a website
+     * @param url The URL of the website to scrape
+     * @param prompt The prompt to use for the scrape
+     * @param callbackUrl The URL to send the scrape results to
+     * @returns The scrape results
+     */
     async scrape(url, prompt, callbackUrl) {
         try {
             const response = await axios.post("https://yfcb5ugk4m.execute-api.af-south-1.amazonaws.com/prod", {
@@ -75,7 +109,7 @@ export class ScrapeClient {
      */
     parseWebhookBody(body) {
         const parsed = JSON.parse(body);
-        return WebhookBodySchema.parse(parsed);
+        return webHookSchema.parse(parsed);
     }
 }
 //  Example usage with Express:
