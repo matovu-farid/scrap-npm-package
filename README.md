@@ -75,24 +75,61 @@ Initiates a scraping operation and sends results to the specified callback URL u
 | prompt      | string | Instructions for what data to extract   |
 | callbackUrl | string | URL where results will be sent via POST |
 
-#### Callback Response
+### Webhook Events
 
-Your callback URL will receive a POST request with the following data structure:
+The library supports two types of webhook events:
+
+#### Links Event
+
+Received when links are extracted from a page:
 
 ```typescript
-interface CallbackResponse {
-  status: "success" | "error";
-  data?: {
-    url: string;
-    results: any[];
-    timestamp: string;
-  };
-  error?: {
-    message: string;
-    code: string;
+interface LinksEventData {
+  type: "links";
+  data: {
+    links: string[];
   };
 }
 ```
+
+#### Scraped Event
+
+Received when content is scraped from a page:
+
+```typescript
+interface ScrapedEventData {
+  type: "scraped";
+  data: {
+    url: string;
+    results: string;
+  };
+}
+```
+
+### scrapeClient.verifyWebhook(options)
+
+Verifies that a webhook request is authentic and recent.
+
+#### Parameters
+
+| Parameter | Type   | Description                                                 |
+| --------- | ------ | ----------------------------------------------------------- |
+| body      | string | The raw request body as a string                            |
+| signature | string | The signature from x-webhook-signature header               |
+| timestamp | string | The timestamp from x-webhook-timestamp header               |
+| maxAge?   | number | Maximum age of webhook in milliseconds (default: 5 minutes) |
+
+### scrapeClient.parseWebhookBody(body)
+
+Parses and validates the webhook body.
+
+#### Parameters
+
+| Parameter | Type   | Description                      |
+| --------- | ------ | -------------------------------- |
+| body      | string | The raw webhook body as a string |
+
+Returns the parsed and validated webhook event.
 
 ## Environment Variables
 
@@ -102,11 +139,11 @@ The library requires the following environment variable:
 
 ## Example Callback Server
 
-Here's a simple example of how to handle the callback response using Express:
+Here's a complete example of how to handle webhook events using Express:
 
 ```typescript
 import express from "express";
-import { ScrapeClient } from "scrap-ai";
+import { ScrapeClient, isLinksEvent, isScrapedEvent } from "scrap-ai";
 
 const app = express();
 app.use(express.json());
@@ -114,70 +151,41 @@ app.use(express.json());
 const scrapeClient = new ScrapeClient(process.env.SCRAP_API_KEY);
 
 app.post("/webhook", (req, res) => {
-  // Verify the webhook is authentic
-  const isValid = scrapeClient.verifyWebhook({
-    body: JSON.stringify(req.body),
-    signature: req.headers["x-webhook-signature"],
-    timestamp: req.headers["x-webhook-timestamp"],
-    maxAge: 5 * 60 * 1000, // Optional: customize max age (default 5 minutes)
-  });
+  try {
+    // Verify the webhook is authentic
+    const isValid = scrapeClient.verifyWebhook({
+      body: JSON.stringify(req.body),
+      signature: req.headers["x-webhook-signature"] as string,
+      timestamp: req.headers["x-webhook-timestamp"] as string,
+    });
 
-  if (!isValid) {
-    return res.status(401).json({ error: "Invalid webhook" });
+    if (!isValid) {
+      return res.status(401).json({ error: "Invalid webhook" });
+    }
+
+    // Parse and validate the webhook body
+    const event = scrapeClient.parseWebhookBody(JSON.stringify(req.body));
+
+    // Handle different event types
+    if (isLinksEvent(event)) {
+      console.log("Received links:", event.data.data.links);
+      // Process the extracted links
+    } else if (isScrapedEvent(event)) {
+      console.log("Received scraped content:", event.data.data.results);
+      // Process the scraped content
+    }
+
+    res.sendStatus(200);
+  } catch (error) {
+    console.error("Error processing webhook:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
-
-  const { status, data, error } = req.body;
-
-  if (status === "success") {
-    console.log("Scraping results:", data);
-    // Process the scraped data
-  } else {
-    console.error("Scraping error:", error);
-    // Handle the error
-  }
-
-  res.sendStatus(200);
 });
 
 app.listen(3000, () => {
   console.log("Webhook server running on port 3000");
 });
 ```
-
-## Setting Up Your Callback Endpoint
-
-Your callback endpoint should:
-
-1. Accept POST requests
-2. Parse JSON body
-3. Handle both success and error responses
-4. Return a 200 status code to acknowledge receipt
-5. Verify webhook signatures to ensure authenticity
-
-Security considerations:
-
-- Verify the webhook signature using your API key
-- Check the timestamp to prevent replay attacks
-- Use HTTPS for secure data transmission
-- Validate the incoming data structure
-- Set appropriate request timeout limits
-
-### Webhook Authentication
-
-Each webhook request includes the following headers:
-
-| Header                | Description                                                                         |
-| --------------------- | ----------------------------------------------------------------------------------- |
-| `x-webhook-signature` | HMAC SHA-256 signature of `${timestamp}.${JSON.stringify(body)}` using your API key |
-| `x-webhook-timestamp` | Unix timestamp when the webhook was sent                                            |
-
-To verify the webhook:
-
-1. Get the signature and timestamp from headers
-2. Concatenate the timestamp and JSON body with a period
-3. Create an HMAC SHA-256 of this string using your API key
-4. Compare the generated signature with the one in the header
-5. Verify the timestamp is recent (within 5 minutes) to prevent replay attacks
 
 ## License
 
