@@ -35,7 +35,7 @@ const { ScrapeClient } = require("scrap-ai");
 
 ## Usage
 
-The library provides a `ScrapeClient` class for initiating web scraping operations and verifying webhook callbacks:
+The library provides a `ScrapeClient` class for initiating web scraping operations:
 
 ```typescript
 import { ScrapeClient } from "scrap-ai";
@@ -43,12 +43,14 @@ import { ScrapeClient } from "scrap-ai";
 // Initialize the client with your API key
 const scrapeClient = new ScrapeClient(process.env.SCRAP_API_KEY);
 
-// Start scraping
-await scrapeClient.scrape(
-  "https://example.com",
-  "Extract all product titles and prices",
-  "https://your-api.com/webhook"
-);
+// Start scraping with options
+await scrapeClient.scrape({
+  url: "https://example.com",
+  prompt: "Extract all product titles and prices",
+  callbackUrl: "https://your-api.com/webhook",
+  maxPages: 10, // Optional: limit number of pages to scrape
+  allowedDomains: ["example.com"], // Optional: restrict scraping to specific domains
+});
 ```
 
 ## API Reference
@@ -63,17 +65,27 @@ Creates a new scraping client instance.
 | --------- | ------ | ------------------------------- |
 | apiKey    | string | Your API key for authentication |
 
-### scrapeClient.scrape(url, prompt, callbackUrl)
+### scrapeClient.scrape(options)
 
 Initiates a scraping operation and sends results to the specified callback URL upon completion.
 
 #### Parameters
 
-| Parameter   | Type   | Description                             |
-| ----------- | ------ | --------------------------------------- |
-| url         | string | The URL of the webpage to scrape        |
-| prompt      | string | Instructions for what data to extract   |
-| callbackUrl | string | URL where results will be sent via POST |
+| Parameter | Type          | Description                                     |
+| --------- | ------------- | ----------------------------------------------- |
+| options   | ScrapeOptions | Configuration object for the scraping operation |
+
+The ScrapeOptions interface includes:
+
+```typescript
+interface ScrapeOptions {
+  url: string; // The URL of the webpage to scrape
+  prompt: string; // Instructions for what data to extract
+  callbackUrl: string; // URL where results will be sent via POST
+  maxPages?: number; // Optional: Maximum number of pages to scrape
+  allowedDomains?: string[]; // Optional: Array of allowed domains to scrape
+}
+```
 
 ### Webhook Events
 
@@ -101,7 +113,7 @@ interface ScrapedEventData {
   type: "scraped";
   data: {
     url: string;
-    results: string;
+    results: any; // The scraped data in the format specified by the prompt
   };
 }
 ```
@@ -137,54 +149,31 @@ The library requires the following environment variable:
 
 - `SCRAP_API_KEY`: Your API key for authentication
 
-## Example Callback Server
+## Example Usage
 
-Here's a complete example of how to handle webhook events using Express:
+Here's a complete example of how to use the scraping client:
 
 ```typescript
-import express from "express";
-import { ScrapeClient, isLinksEvent, isScrapedEvent } from "scrap-ai";
-
-const app = express();
-app.use(express.json());
+import { ScrapeClient } from "scrap-ai";
 
 const scrapeClient = new ScrapeClient(process.env.SCRAP_API_KEY);
 
-app.post("/webhook", (req, res) => {
+async function startScraping() {
   try {
-    // Verify the webhook is authentic
-    const isValid = scrapeClient.verifyWebhook({
-      body: JSON.stringify(req.body),
-      signature: req.headers["x-webhook-signature"] as string,
-      timestamp: req.headers["x-webhook-timestamp"] as string,
+    await scrapeClient.scrape({
+      url: "https://example.com",
+      prompt: "Extract all product titles, prices, and descriptions",
+      callbackUrl: "https://your-api.com/webhook",
+      maxPages: 5,
+      allowedDomains: ["example.com"],
     });
-
-    if (!isValid) {
-      return res.status(401).json({ error: "Invalid webhook" });
-    }
-
-    // Parse and validate the webhook body
-    const event = scrapeClient.parseWebhookBody(JSON.stringify(req.body));
-
-    // Handle different event types
-    if (isLinksEvent(event)) {
-      console.log("Received links:", event.data.data.links);
-      // Process the extracted links
-    } else if (isScrapedEvent(event)) {
-      console.log("Received scraped content:", event.data.data.results);
-      // Process the scraped content
-    }
-
-    res.sendStatus(200);
+    console.log("Scraping initiated successfully");
   } catch (error) {
-    console.error("Error processing webhook:", error);
-    res.status(500).json({ error: "Internal server error" });
+    console.error("Error starting scrape:", error);
   }
-});
+}
 
-app.listen(3000, () => {
-  console.log("Webhook server running on port 3000");
-});
+startScraping();
 ```
 
 ## License
