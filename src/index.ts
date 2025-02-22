@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import crypto from "crypto";
 import { z } from "zod";
 /**
@@ -89,7 +89,15 @@ export class ScrapeClient {
       );
       return response.data;
     } catch (error) {
-      console.error(error);
+      if (error instanceof AxiosError) {
+        console.error(error.response?.data);
+      } else {
+        if (error instanceof Error) {
+          console.error(error.message);
+        } else {
+          console.error(error);
+        }
+      }
       throw error;
     }
   }
