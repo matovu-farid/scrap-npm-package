@@ -104,7 +104,7 @@ export class ScrapeClient {
   verifyWebhook(options: WebhookVerificationOptions): boolean {
     const { body, signature, timestamp, maxAge = 5 * 60 * 1000 } = options;
 
-    if (!body || !signature || !timestamp || !this.apiKey) {
+    if (!body || !signature || !timestamp) {
       throw new Error("Missing required webhook verification parameters");
     }
 

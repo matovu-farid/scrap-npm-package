@@ -16,20 +16,25 @@ export declare const linksSchema: z.ZodObject<{
     type: z.ZodLiteral<"links">;
     data: z.ZodObject<{
         links: z.ZodArray<z.ZodString, "many">;
+        host: z.ZodString;
     }, "strip", z.ZodTypeAny, {
         links: string[];
+        host: string;
     }, {
         links: string[];
+        host: string;
     }>;
 }, "strip", z.ZodTypeAny, {
     type: "links";
     data: {
         links: string[];
+        host: string;
     };
 }, {
     type: "links";
     data: {
         links: string[];
+        host: string;
     };
 }>;
 export declare const scrapedSchema: z.ZodObject<{
@@ -65,20 +70,25 @@ export declare const linksEventWebHookSchema: z.ZodObject<{
         type: z.ZodLiteral<"links">;
         data: z.ZodObject<{
             links: z.ZodArray<z.ZodString, "many">;
+            host: z.ZodString;
         }, "strip", z.ZodTypeAny, {
             links: string[];
+            host: string;
         }, {
             links: string[];
+            host: string;
         }>;
     }, "strip", z.ZodTypeAny, {
         type: "links";
         data: {
             links: string[];
+            host: string;
         };
     }, {
         type: "links";
         data: {
             links: string[];
+            host: string;
         };
     }>;
     headers: z.ZodRecord<z.ZodString, z.ZodString>;
@@ -87,6 +97,7 @@ export declare const linksEventWebHookSchema: z.ZodObject<{
         type: "links";
         data: {
             links: string[];
+            host: string;
         };
     };
     webhook: string;
@@ -96,6 +107,7 @@ export declare const linksEventWebHookSchema: z.ZodObject<{
         type: "links";
         data: {
             links: string[];
+            host: string;
         };
     };
     webhook: string;
@@ -156,20 +168,25 @@ export declare const webHookSchema: z.ZodUnion<[z.ZodObject<{
         type: z.ZodLiteral<"links">;
         data: z.ZodObject<{
             links: z.ZodArray<z.ZodString, "many">;
+            host: z.ZodString;
         }, "strip", z.ZodTypeAny, {
             links: string[];
+            host: string;
         }, {
             links: string[];
+            host: string;
         }>;
     }, "strip", z.ZodTypeAny, {
         type: "links";
         data: {
             links: string[];
+            host: string;
         };
     }, {
         type: "links";
         data: {
             links: string[];
+            host: string;
         };
     }>;
     headers: z.ZodRecord<z.ZodString, z.ZodString>;
@@ -178,6 +195,7 @@ export declare const webHookSchema: z.ZodUnion<[z.ZodObject<{
         type: "links";
         data: {
             links: string[];
+            host: string;
         };
     };
     webhook: string;
@@ -187,6 +205,7 @@ export declare const webHookSchema: z.ZodUnion<[z.ZodObject<{
         type: "links";
         data: {
             links: string[];
+            host: string;
         };
     };
     webhook: string;
@@ -247,6 +266,7 @@ export declare const isLinksEvent: (event: WebHookEvent) => event is {
         type: "links";
         data: {
             links: string[];
+            host: string;
         };
     };
     webhook: string;

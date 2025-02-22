@@ -2,7 +2,7 @@
   "module": "./esm/index.js",
   "main": "./script/index.js",
   "name": "scrap-ai",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "Scrap AI is a package that scrapes a website and returns the content",
   "license": "MIT",
   "repository": {

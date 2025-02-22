@@ -20,6 +20,7 @@ export const linksSchema = z.object({
   type: z.literal("links"),
   data: z.object({
     links: z.array(z.string()),
+    host: z.string(),
   }),
 });
 

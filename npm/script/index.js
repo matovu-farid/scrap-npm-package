@@ -11,6 +11,7 @@ exports.linksSchema = zod_1.z.object({
     type: zod_1.z.literal("links"),
     data: zod_1.z.object({
         links: zod_1.z.array(zod_1.z.string()),
+        host: zod_1.z.string(),
     }),
 });
 exports.scrapedSchema = zod_1.z.object({
