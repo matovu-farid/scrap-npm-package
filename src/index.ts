@@ -103,9 +103,14 @@ export class ScrapeClient {
    */
   verifyWebhook(options: WebhookVerificationOptions): boolean {
     const { body, signature, timestamp, maxAge = 5 * 60 * 1000 } = options;
-
-    if (!body || !signature || !timestamp) {
-      throw new Error("Missing required webhook verification parameters");
+    if (!body) {
+      throw new Error("Missing body");
+    }
+    if (!signature) {
+      throw new Error("Missing signature");
+    }
+    if (!timestamp) {
+      throw new Error("Missing timestamp");
     }
 
     // Verify timestamp is recent
