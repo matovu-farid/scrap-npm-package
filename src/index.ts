@@ -1,6 +1,7 @@
 import axios, { AxiosError } from "axios";
 import crypto from "crypto";
 import { z } from "zod";
+import { getSigniture } from "./getSigniture.ts";
 /**
  * Options for verifying webhook signatures
  */
@@ -74,7 +75,7 @@ export class ScrapeClient {
   async scrape(url: string, prompt: string, callbackUrl: string) {
     try {
       const response = await axios.post(
-        "https://yfcb5ugk4m.execute-api.af-south-1.amazonaws.com/prod",
+        "https://m9e5pxuzj7.execute-api.af-south-1.amazonaws.com/dev/api/scrap",
         {
           url,
           prompt,
@@ -110,7 +111,7 @@ export class ScrapeClient {
    * @throws Error if required parameters are missing
    */
   verifyWebhook(options: WebhookVerificationOptions): boolean {
-    const { body, signature, timestamp, maxAge = 5 * 60 * 1000 } = options;
+    const { body, signature, timestamp, maxAge = 50 * 60 * 1000 } = options;
     if (!body) {
       throw new Error("Missing body");
     }
@@ -125,14 +126,12 @@ export class ScrapeClient {
     const timestampMs = Number(timestamp);
     const now = Date.now();
     if (isNaN(timestampMs) || Math.abs(now - timestampMs) > maxAge) {
+      console.error("Timestamp is not recent");
+      console.log({ timestampMs, now, maxAge });
       return false;
     }
 
-    // Calculate expected signature
-    const expectedSignature = crypto
-      .createHmac("sha256", this.apiKey)
-      .update(`${timestamp}.${body}`)
-      .digest("hex");
+    const expectedSignature = getSigniture(body, this.apiKey);
 
     // Compare signatures using timing-safe equality
     try {
