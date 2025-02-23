@@ -126,12 +126,12 @@ export class ScrapeClient {
     const timestampMs = Number(timestamp);
     const now = Date.now();
     if (isNaN(timestampMs) || Math.abs(now - timestampMs) > maxAge) {
-      console.error("Timestamp is not recent");
       console.log({ timestampMs, now, maxAge });
+      console.error("Timestamp is not recent");
       return false;
     }
 
-    const expectedSignature = getSigniture(body, this.apiKey);
+    const expectedSignature = getSigniture(body, this.apiKey, timestamp);
 
     // Compare signatures using timing-safe equality
     try {
