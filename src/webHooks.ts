@@ -16,37 +16,47 @@ export const scrapedSchema = z.object({
   }),
 });
 
-type LinksEvent = z.infer<typeof linksEventWebHookSchema>;
+export const exploreSchema = z.object({
+  type: z.literal("explore"),
+  data: z.object({
+    url: z.string(),
+  }),
+});
 export type LinksEventData = z.infer<typeof linksSchema>;
-type ScrapedEvent = z.infer<typeof scrapedEventWebHookSchema>;
 export type ScrapedEventData = z.infer<typeof scrapedSchema>;
+export type ExploreEventData = z.infer<typeof exploreSchema>;
+export const webHookSchemaEventData = z.union([
+  exploreSchema,
+  linksSchema,
+  scrapedSchema,
+]);
 
-export const linksEventWebHookSchema = z.object({
+export const webHookSchema = z.object({
   webhook: z.string(),
-  data: linksSchema,
+  data: webHookSchemaEventData,
   headers: z.record(z.string(), z.string()),
 });
-
-export const scrapedEventWebHookSchema = z.object({
-  webhook: z.string(),
-  data: scrapedSchema,
-  headers: z.record(z.string(), z.string()),
-});
-
-export const webHookSchema = z.union([linksSchema, scrapedSchema]);
 export type WebHookEvent = z.infer<typeof webHookSchema>;
 export type WebHookEventData = z.infer<typeof webHookSchema>["data"];
 export const isLinksEventData = (data: unknown): data is LinksEventData => {
-  const parsed = webHookSchema.safeParse(data);
+  const parsed = webHookSchemaEventData.safeParse(data);
   if (!parsed.success) {
     throw new Error("Invalid webhook event");
   }
   return parsed.data.type === "links";
 };
 export const isScrapedEventData = (data: unknown): data is ScrapedEventData => {
-  const parsed = webHookSchema.safeParse(data);
+  const parsed = webHookSchemaEventData.safeParse(data);
   if (!parsed.success) {
     throw new Error("Invalid webhook event");
   }
   return parsed.data.type === "scraped";
+};
+
+export const isExploreEventData = (data: unknown): data is ExploreEventData => {
+  const parsed = webHookSchemaEventData.safeParse(data);
+  if (!parsed.success) {
+    throw new Error("Invalid webhook event");
+  }
+  return parsed.data.type === "explore";
 };
