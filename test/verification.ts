@@ -1,6 +1,7 @@
 import express from "express";
 import bodyParser from "body-parser";
-import { ScrapeClient } from "../src/index.ts";
+import { isLinksEvent, isScrapedEvent, ScrapeClient } from "../src/index.ts";
+import { isLinksEventData, isScrapedEventData } from "../src/webHooks.ts";
 
 const app = express();
 
@@ -21,6 +22,15 @@ app.post("/api/scrape-callback", async (req, res) => {
     maxAge: 500 * 60 * 1000, // Optional: customize max age (default 5 minutes)
   });
   console.log({ isValid });
+  console.log({ body });
+
+  if (isScrapedEventData(body)) {
+    console.log({ results: body.data.results });
+  } else if (isLinksEventData(body)) {
+    const links = body.data.links;
+    const host = body.data.host;
+    console.log({ links, host });
+  }
 
   res.send("ok");
 });
