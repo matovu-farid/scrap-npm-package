@@ -92,6 +92,7 @@ export class ScrapeClient {
     }
 
     const expectedSignature = getSigniture(body, this.apiKey, timestamp);
+    console.log({ expectedSignature, signature });
 
     // Compare signatures using timing-safe equality
     try {
@@ -100,6 +101,7 @@ export class ScrapeClient {
         Buffer.from(expectedSignature)
       );
     } catch {
+      console.error("Error verifying webhook signature");
       return false;
     }
   }
