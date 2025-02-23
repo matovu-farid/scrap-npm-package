@@ -6,6 +6,7 @@ import { WebHookEvent, webHookSchema } from "./webHooks.ts";
 export {
   isScrapedEventData as isScrapedEvent,
   isLinksEventData as isLinksEvent,
+  isExploreEventData as isExploreEvent,
 } from "./webHooks.ts";
 /**
  * Options for verifying webhook signatures
