@@ -2,6 +2,7 @@ import express from "express";
 import bodyParser from "body-parser";
 import { isLinksEvent, isScrapedEvent, ScrapeClient } from "../src/index.ts";
 import { isLinksEventData, isScrapedEventData } from "../src/webHooks.ts";
+import { hash } from "../src/getSigniture.ts";
 
 const app = express();
 
@@ -14,9 +15,12 @@ app.post("/api/scrape-callback", async (req, res) => {
   const body = req.body;
   const signature = headersList["x-webhook-signature"] as string;
   const timestamp = headersList["x-webhook-timestamp"] as string;
+  const receivedHash = headersList["x-hwebhook-hash"] as string;
+  const expectedHash = hash(body);
+  console.log({ receivedHash, expectedHash });
 
   const isValid = scrapeClient.verifyWebhook({
-    body: JSON.stringify(body),
+    body,
     signature: signature,
     timestamp: timestamp,
     maxAge: 500 * 60 * 1000, // Optional: customize max age (default 5 minutes)

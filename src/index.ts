@@ -12,8 +12,8 @@ export {
  * Options for verifying webhook signatures
  */
 export interface WebhookVerificationOptions {
-  /** The raw request body as a string */
-  body: string;
+  /** The raw request body as an object */
+  body: Object;
   /** The signature from x-webhook-signature header */
   signature: string;
   /** The timestamp from x-webhook-timestamp header */
