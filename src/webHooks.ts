@@ -6,7 +6,7 @@ export const linksSchema = z.object({
     links: z.array(z.string()),
     host: z.string(),
   }),
-  id: z.string().optional(),
+  id: z.string(),
 });
 
 export const scrapedSchema = z.object({
@@ -15,7 +15,7 @@ export const scrapedSchema = z.object({
     url: z.string(),
     results: z.string(),
   }),
-  id: z.string().optional(),
+  id: z.string(),
 });
 
 export const exploreSchema = z.object({
@@ -23,7 +23,7 @@ export const exploreSchema = z.object({
   data: z.object({
     url: z.string(),
   }),
-  id: z.string().optional(),
+  id: z.string(),
 });
 export type LinksEventData = z.infer<typeof linksSchema>;
 export type ScrapedEventData = z.infer<typeof scrapedSchema>;

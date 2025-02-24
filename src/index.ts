@@ -32,7 +32,7 @@ export class ScrapeClient {
    * @param callbackUrl The URL to send the scrape results to
    * @returns The scrape results
    */
-  async scrape(url: string, prompt: string, callbackUrl: string) {
+  async scrape(url: string, prompt: string, callbackUrl: string, id?: string) {
     try {
       const response = await axios.post(
         "https://m9e5pxuzj7.execute-api.af-south-1.amazonaws.com/dev/api/scrap",
@@ -40,6 +40,7 @@ export class ScrapeClient {
           url,
           prompt,
           callbackUrl,
+          id: id || "",
         },
         {
           headers: {
