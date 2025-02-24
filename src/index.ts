@@ -90,10 +90,8 @@ export class ScrapeClient {
       console.error("Timestamp is not recent");
       return false;
     }
-    const bodyHash = hash(body);
 
     const expectedSignature = getSigniture(body, this.apiKey, timestamp);
-    console.log({ expectedSignature, signature, hash: bodyHash });
 
     // Compare signatures using timing-safe equality
     try {

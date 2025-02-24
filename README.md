@@ -30,8 +30,9 @@ const { ScrapeClient } = require("scrap-ai");
 - 🤖 AI-powered data extraction
 - 🔄 Asynchronous processing with callback support
 - 📑 Multi-page scraping and indexing
-- 🔒 Secure API key authentication
+- 🔒 Secure webhook verification
 - 📦 TypeScript support
+- 🌐 Cross-platform (Node.js and Deno)
 
 ## Usage
 
@@ -40,8 +41,11 @@ The library provides a `ScrapeClient` class for initiating web scraping operatio
 ```typescript
 import { ScrapeClient } from "scrap-ai";
 
-// Initialize the client with your API key
-const scrapeClient = new ScrapeClient(process.env.SCRAP_API_KEY);
+// Initialize the client with your API key and webhook secret
+const scrapeClient = new ScrapeClient({
+  apiKey: process.env.SCRAP_API_KEY,
+  webhookSecret: process.env.WEBHOOK_SECRET,
+});
 
 // Start scraping with options
 await scrapeClient.scrape({
@@ -55,15 +59,16 @@ await scrapeClient.scrape({
 
 ## API Reference
 
-### new ScrapeClient(apiKey)
+### new ScrapeClient(config)
 
 Creates a new scraping client instance.
 
 #### Parameters
 
-| Parameter | Type   | Description                     |
-| --------- | ------ | ------------------------------- |
-| apiKey    | string | Your API key for authentication |
+| Parameter            | Type   | Description                         |
+| -------------------- | ------ | ----------------------------------- |
+| config.apiKey        | string | Your API key for authentication     |
+| config.webhookSecret | string | Secret key for webhook verification |
 
 ### scrapeClient.scrape(options)
 
@@ -120,7 +125,7 @@ interface ScrapedEventData {
 
 ### scrapeClient.verifyWebhook(options)
 
-Verifies that a webhook request is authentic and recent.
+Verifies that a webhook request is authentic using HMAC-SHA256 signature verification.
 
 #### Parameters
 
@@ -145,19 +150,24 @@ Returns the parsed and validated webhook event.
 
 ## Environment Variables
 
-The library requires the following environment variable:
+The library requires the following environment variables:
 
 - `SCRAP_API_KEY`: Your API key for authentication
+- `WEBHOOK_SECRET`: Your webhook secret key for verifying webhook signatures
 
 ## Example Usage
 
-Here's a complete example of how to use the scraping client:
+Here's a complete example of how to use the scraping client with webhook verification:
 
 ```typescript
 import { ScrapeClient } from "scrap-ai";
 
-const scrapeClient = new ScrapeClient(process.env.SCRAP_API_KEY);
+const scrapeClient = new ScrapeClient({
+  apiKey: process.env.SCRAP_API_KEY,
+  webhookSecret: process.env.WEBHOOK_SECRET,
+});
 
+// Start scraping
 async function startScraping() {
   try {
     await scrapeClient.scrape({
@@ -170,6 +180,27 @@ async function startScraping() {
     console.log("Scraping initiated successfully");
   } catch (error) {
     console.error("Error starting scrape:", error);
+  }
+}
+
+// Handle webhook
+async function handleWebhook(req, res) {
+  const body = await getRawBody(req);
+  const signature = req.headers["x-webhook-signature"];
+  const timestamp = req.headers["x-webhook-timestamp"];
+
+  try {
+    // Verify the webhook signature
+    scrapeClient.verifyWebhook({ body, signature, timestamp });
+
+    // Parse and process the webhook data
+    const event = scrapeClient.parseWebhookBody(body);
+    console.log("Received verified webhook:", event);
+
+    res.status(200).send("OK");
+  } catch (error) {
+    console.error("Webhook verification failed:", error);
+    res.status(400).send("Invalid webhook");
   }
 }
 
