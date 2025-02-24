@@ -3,6 +3,7 @@ import crypto from "crypto";
 import { z } from "zod";
 import { getSigniture, hash } from "./getSigniture.ts";
 import { WebHookEvent, webHookSchema } from "./webHooks.ts";
+import { ApiMessage } from "./apiMessage.ts";
 export {
   isScrapedEventData as isScrapedEvent,
   isLinksEventData as isLinksEvent,
@@ -32,16 +33,19 @@ export class ScrapeClient {
    * @param callbackUrl The URL to send the scrape results to
    * @returns The scrape results
    */
-  async scrape(url: string, prompt: string, callbackUrl: string, id?: string) {
+  async scrape(url: string, prompt: string, callbackUrl: string, id?: string, type?: ApiMessage["type"]) {
+    const data:ApiMessage = {
+      url,
+      prompt,
+      callbackUrl,
+      id: id || "",
+      type: type || "text",
+    };
+
     try {
       const response = await axios.post(
         "https://m9e5pxuzj7.execute-api.af-south-1.amazonaws.com/dev/api/scrap",
-        {
-          url,
-          prompt,
-          callbackUrl,
-          id: id || "",
-        },
+        data,
         {
           headers: {
             "Content-Type": "application/json",
