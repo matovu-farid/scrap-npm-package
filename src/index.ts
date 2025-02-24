@@ -1,7 +1,7 @@
 import axios, { AxiosError } from "axios";
 import crypto from "crypto";
 import { z } from "zod";
-import { getSigniture } from "./getSigniture.ts";
+import { getSigniture, hash } from "./getSigniture.ts";
 import { WebHookEvent, webHookSchema } from "./webHooks.ts";
 export {
   isScrapedEventData as isScrapedEvent,
@@ -90,9 +90,10 @@ export class ScrapeClient {
       console.error("Timestamp is not recent");
       return false;
     }
+    const bodyHash = hash(body);
 
     const expectedSignature = getSigniture(body, this.apiKey, timestamp);
-    console.log({ expectedSignature, signature });
+    console.log({ expectedSignature, signature, hash: bodyHash });
 
     // Compare signatures using timing-safe equality
     try {
