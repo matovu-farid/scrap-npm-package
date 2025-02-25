@@ -1,4 +1,5 @@
 import { build, emptyDir } from "https://deno.land/x/dnt@0.37.0/mod.ts";
+// @ts-ignore
 
 await emptyDir("./npm");
 
@@ -23,6 +24,9 @@ await build({
     },
     dependencies: {
       axios: "^1.7.9",
+      "json-canonicalize": "^1.0.6",
+      zod: "^3.24.1",
+      "zod-to-json-schema": "^3.24.3",
     },
   },
   postBuild() {

@@ -153,7 +153,8 @@
   "workspace": {
     "dependencies": [
       "jsr:@std/assert@1",
-      "npm:axios@^1.7.9"
+      "npm:axios@^1.7.9",
+      "npm:json-canonicalize@^1.0.6"
     ]
   }
 }
