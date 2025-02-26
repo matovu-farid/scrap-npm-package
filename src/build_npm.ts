@@ -1,3 +1,4 @@
+// @ts-ignore
 import { build, emptyDir } from "https://deno.land/x/dnt@0.37.0/mod.ts";
 
 // @ts-ignore
