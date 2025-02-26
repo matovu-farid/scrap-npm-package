@@ -5,6 +5,7 @@ import { getSigniture, hash } from "./getSigniture.ts";
 import { WebHookEvent, webHookSchema } from "./webHooks.ts";
 import { ApiMessage } from "./apiMessage.ts";
 import zodToJsonSchema from "zod-to-json-schema";
+import { jsonSchemaSchema } from "./jsonschema.ts";
 export {
   isScrapedEventData as isScrapedEvent,
   isLinksEventData as isLinksEvent,
@@ -40,27 +41,30 @@ export class ScrapeClient {
     prompt: string,
     callbackUrl: string,
     id?: string,
-    schema?: z.ZodType<any>
+    schema?: unknown
   ) {
     const type: ApiMessage["type"] = schema ? "structured" : "text";
-    const jsonSchema = schema ? zodToJsonSchema(schema, "mySchema") : undefined;
     const baseData = {
       url,
       prompt,
       callbackUrl,
       id: id || "",
     };
+    const parsedSchema = schema
+      ? jsonSchemaSchema.safeParse(schema)
+      : undefined;
 
-    const data: ApiMessage = schema
-      ? {
-          ...baseData,
-          type: "text",
-        }
-      : {
-          ...baseData,
-          type: "structured",
-          schema: jsonSchema,
-        };
+    const data: ApiMessage =
+      schema && parsedSchema!.success
+        ? {
+            ...baseData,
+            type: "structured",
+            schema: parsedSchema!.data,
+          }
+        : {
+            ...baseData,
+            type: "text",
+          };
 
     try {
       const response = await axios.post(
