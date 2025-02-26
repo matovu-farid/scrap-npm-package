@@ -4,7 +4,6 @@ import { z } from "zod";
 import { getSigniture, hash } from "./getSigniture.ts";
 import { WebHookEvent, webHookSchema } from "./webHooks.ts";
 import { ApiMessage } from "./apiMessage.ts";
-import zodToJsonSchema from "zod-to-json-schema";
 import { jsonSchemaSchema } from "./jsonschema.ts";
 export {
   isScrapedEventData as isScrapedEvent,

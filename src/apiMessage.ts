@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { jsonSchemaSchema } from "./jsonschema";
+import { jsonSchemaSchema } from "./jsonschema.ts";
 
 export const baseApiMessageSchema = z.object({
   url: z.string(),
