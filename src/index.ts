@@ -5,7 +5,7 @@ import { WebHookEvent, webHookSchema } from "./webHooks.ts";
 import { ApiMessage } from "./apiMessage.ts";
 import { JsonSchema, jsonSchemaSchema } from "./jsonschema.ts";
 import { z } from "zod";
-import zodToJsonSchema, { JsonSchema7Type } from "zod-to-json-schema";
+import zodToJsonSchema from "zod-to-json-schema";
 export {
   isScrapedEventData as isScrapedEvent,
   isLinksEventData as isLinksEvent,
@@ -41,15 +41,15 @@ export class ScrapeClient {
     prompt: string,
     callbackUrl: string,
     id?: string,
-    schema?: z.ZodType<any>
+    schema?: z.ZodType<any>,
+    recursive: boolean = true
   ) {
-    const type: ApiMessage["type"] = schema ? "structured" : "text";
     const baseData = {
       url,
       prompt,
       callbackUrl,
       id: id || "",
-      recursive: true,
+      recursive,
     };
     let data: ApiMessage = {
       ...baseData,
