@@ -1,10 +1,11 @@
 import axios, { AxiosError } from "axios";
 import crypto from "crypto";
-import { z } from "zod";
-import { getSigniture, hash } from "./getSigniture.ts";
+import { getSigniture } from "./getSigniture.ts";
 import { WebHookEvent, webHookSchema } from "./webHooks.ts";
 import { ApiMessage } from "./apiMessage.ts";
-import { jsonSchemaSchema } from "./jsonschema.ts";
+import { JsonSchema, jsonSchemaSchema } from "./jsonschema.ts";
+import { z } from "zod";
+import zodToJsonSchema, { JsonSchema7Type } from "zod-to-json-schema";
 export {
   isScrapedEventData as isScrapedEvent,
   isLinksEventData as isLinksEvent,
@@ -40,7 +41,7 @@ export class ScrapeClient {
     prompt: string,
     callbackUrl: string,
     id?: string,
-    schema?: unknown
+    schema?: z.ZodType<any>
   ) {
     const type: ApiMessage["type"] = schema ? "structured" : "text";
     const baseData = {
@@ -48,23 +49,27 @@ export class ScrapeClient {
       prompt,
       callbackUrl,
       id: id || "",
+      recursive: true,
     };
-    const parsedSchema = schema
-      ? jsonSchemaSchema.safeParse(schema)
-      : undefined;
+    let data: ApiMessage = {
+      ...baseData,
+      type: "text",
+    };
+    if (schema) {
+      const parsedSchema = jsonSchemaSchema.safeParse(schema);
 
-    const data: ApiMessage =
-      schema && parsedSchema!.success
-        ? {
-            ...baseData,
-            type: "structured",
-            schema: parsedSchema!.data,
-          }
-        : {
-            ...baseData,
-            type: "text",
-          };
+      const jsonSchema = parsedSchema.success
+        ? parsedSchema.data
+        : (zodToJsonSchema(schema) as JsonSchema);
 
+      if (jsonSchema) {
+        data = {
+          ...baseData,
+          type: "structured",
+          schema: jsonSchema,
+        };
+      }
+    }
     try {
       const response = await axios.post(
         "https://m9e5pxuzj7.execute-api.af-south-1.amazonaws.com/dev/api/scrap",
