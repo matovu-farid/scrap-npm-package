@@ -71,16 +71,12 @@ export class ScrapeClient {
       }
     }
     try {
-      const response = await axios.post(
-        "https://m9e5pxuzj7.execute-api.af-south-1.amazonaws.com/dev/api/scrap",
-        data,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            "x-api-key": this.apiKey,
-          },
-        }
-      );
+      const response = await axios.post(process.env.SCRAP_API_URL!, data, {
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": this.apiKey,
+        },
+      });
       return response.data;
     } catch (error) {
       if (error instanceof AxiosError) {
