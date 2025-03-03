@@ -33,7 +33,6 @@ const { ScrapeClient } = require("scrap-ai");
 - 🔒 Secure webhook verification
 - 📦 TypeScript support
 - 🌐 Cross-platform (Node.js and Deno)
-- 📊 Optional structured data extraction with Zod schemas
 
 ## Usage
 
@@ -50,23 +49,15 @@ const scrapeClient = new ScrapeClient(process.env.SCRAP_API_KEY);
 await scrapeClient.scrape(
   "https://example.com",
   "Extract all product titles and prices",
-  "https://your-api.com/webhook",
+  "https://your-api.com/webhook"
 );
 
-// Scraping with structured data using Zod schema
-import { z } from "zod";
-
-const productSchema = z.object({
-  title: z.string(),
-  price: z.number(),
-});
-
+// Scraping with custom ID
 await scrapeClient.scrape(
   "https://example.com",
   "Extract product information",
   "https://your-api.com/webhook",
-  "optional-custom-id",
-  productSchema,
+  "optional-custom-id"
 );
 ```
 
@@ -82,20 +73,19 @@ Creates a new scraping client instance.
 | --------- | ------ | ------------------------------- |
 | apiKey    | string | Your API key for authentication |
 
-### scrapeClient.scrape(url, prompt, callbackUrl, id?, schema?)
+### scrapeClient.scrape(url, prompt, callbackUrl, id?)
 
 Initiates a scraping operation and sends results to the specified callback URL
 upon completion.
 
 #### Parameters
 
-| Parameter   | Type      | Description                                         |
-| ----------- | --------- | --------------------------------------------------- |
-| url         | string    | The URL of the webpage to scrape                    |
-| prompt      | string    | Instructions for what data to extract               |
-| callbackUrl | string    | URL where results will be sent via POST             |
-| id?         | string    | Optional custom identifier for the scraping request |
-| schema?     | z.ZodType | Optional Zod schema for structured data extraction  |
+| Parameter   | Type   | Description                                         |
+| ----------- | ------ | --------------------------------------------------- |
+| url         | string | The URL of the webpage to scrape                    |
+| prompt      | string | Instructions for what data to extract               |
+| callbackUrl | string | URL where results will be sent via POST             |
+| id?         | string | Optional custom identifier for the scraping request |
 
 ### Webhook Verification
 
@@ -172,7 +162,7 @@ app.post("/start-scrape", async (req, res) => {
     const result = await scrapeClient.scrape(
       "https://example.com",
       "Extract product information",
-      "https://your-api.com/webhook",
+      "https://your-api.com/webhook"
     );
     res.json(result);
   } catch (error) {
@@ -191,4 +181,5 @@ details.
 Contributions are welcome! Please feel free to submit a Pull Request.
 
 ```
+
 ```
