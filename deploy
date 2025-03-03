@@ -2,8 +2,8 @@
 
 version=$1
 if [ -z "$version" ]; then
-  echo "Usage: $0 <version>"
-  exit 1
+    echo "Usage: $0 <version>"
+    exit 1
 fi
 
-deno run -A src/build_npm.ts $version && npm publish ./npm
+deno run  -A src/build_npm.ts $version && npm publish ./npm

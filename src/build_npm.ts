@@ -7,6 +7,7 @@ await emptyDir("./npm");
 await build({
   entryPoints: ["./src/index.ts"],
   outDir: "./npm",
+  test: false,
   shims: {
     deno: true,
   },
@@ -30,6 +31,9 @@ await build({
       "zod-to-json-schema": "^3.24.3",
       ajv: "^8.17.1",
     },
+  },
+  devDependencies: {
+    "@types/bun": "^1.2.4",
   },
   postBuild() {
     Deno.copyFileSync("LICENSE", "npm/LICENSE");

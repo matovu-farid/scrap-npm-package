@@ -7,9 +7,9 @@ import { JsonSchema, jsonSchemaSchema } from "./jsonschema.ts";
 import { z } from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 export {
-  isScrapedEventData as isScrapedEvent,
-  isLinksEventData as isLinksEvent,
   isExploreEventData as isExploreEvent,
+  isLinksEventData as isLinksEvent,
+  isScrapedEventData as isScrapedEvent,
 } from "./webHooks.ts";
 /**
  * Options for verifying webhook signatures
@@ -133,7 +133,7 @@ export class ScrapeClient {
     try {
       return crypto.timingSafeEqual(
         Buffer.from(signature),
-        Buffer.from(expectedSignature)
+        Buffer.from(expectedSignature),
       );
     } catch {
       console.error("Error verifying webhook signature");

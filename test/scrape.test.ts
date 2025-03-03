@@ -1,11 +1,9 @@
 import express from "express";
 import type { Server } from "http";
 import bodyParser from "body-parser";
-import { expect, it, describe, beforeAll, afterAll } from "bun:test";
 import assert from "assert";
 import { webHookSchemaEventData } from "../src/webHooks";
 import { ScrapeClient } from "../src";
-
 const app = express();
 let server: Server;
 

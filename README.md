@@ -1,6 +1,7 @@
 # Web Scraping Helper
 
-A lightweight TypeScript library for asynchronous web scraping with customizable prompts and callback support.
+A lightweight TypeScript library for asynchronous web scraping with customizable
+prompts and callback support.
 
 ## Installation
 
@@ -36,7 +37,8 @@ const { ScrapeClient } = require("scrap-ai");
 
 ## Usage
 
-The library provides a `ScrapeClient` class for initiating web scraping operations:
+The library provides a `ScrapeClient` class for initiating web scraping
+operations:
 
 ```typescript
 import { ScrapeClient } from "scrap-ai";
@@ -48,7 +50,7 @@ const scrapeClient = new ScrapeClient(process.env.SCRAP_API_KEY);
 await scrapeClient.scrape(
   "https://example.com",
   "Extract all product titles and prices",
-  "https://your-api.com/webhook"
+  "https://your-api.com/webhook",
 );
 
 // Scraping with structured data using Zod schema
@@ -64,7 +66,7 @@ await scrapeClient.scrape(
   "Extract product information",
   "https://your-api.com/webhook",
   "optional-custom-id",
-  productSchema
+  productSchema,
 );
 ```
 
@@ -82,7 +84,8 @@ Creates a new scraping client instance.
 
 ### scrapeClient.scrape(url, prompt, callbackUrl, id?, schema?)
 
-Initiates a scraping operation and sends results to the specified callback URL upon completion.
+Initiates a scraping operation and sends results to the specified callback URL
+upon completion.
 
 #### Parameters
 
@@ -96,7 +99,8 @@ Initiates a scraping operation and sends results to the specified callback URL u
 
 ### Webhook Verification
 
-The library provides webhook verification to ensure the authenticity of incoming webhook requests:
+The library provides webhook verification to ensure the authenticity of incoming
+webhook requests:
 
 ```typescript
 const isValid = scrapeClient.verifyWebhook({
@@ -108,7 +112,8 @@ const isValid = scrapeClient.verifyWebhook({
 
 ### scrapeClient.verifyWebhook(options)
 
-Verifies that a webhook request is authentic using timing-safe signature comparison.
+Verifies that a webhook request is authentic using timing-safe signature
+comparison.
 
 #### Parameters
 
@@ -133,7 +138,8 @@ Returns the parsed and validated webhook event.
 
 ## Example Usage with Express
 
-Here's a complete example of how to use the scraping client with webhook verification in an Express application:
+Here's a complete example of how to use the scraping client with webhook
+verification in an Express application:
 
 ```typescript
 import { ScrapeClient } from "scrap-ai";
@@ -166,7 +172,7 @@ app.post("/start-scrape", async (req, res) => {
     const result = await scrapeClient.scrape(
       "https://example.com",
       "Extract product information",
-      "https://your-api.com/webhook"
+      "https://your-api.com/webhook",
     );
     res.json(result);
   } catch (error) {
@@ -177,12 +183,12 @@ app.post("/start-scrape", async (req, res) => {
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the LICENSE file for
+details.
 
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
 ```
-
 ```
