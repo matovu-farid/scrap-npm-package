@@ -36,14 +36,21 @@ export class ScrapeClient {
    * @returns The scrape results
    */
 
-  async scrape(
-    url: string,
-    prompt: string,
-    callbackUrl: string,
-    id?: string,
-    schema?: z.ZodType<any>,
-    recursive: boolean = true
-  ) {
+  async scrape({
+    url,
+    prompt,
+    callbackUrl,
+    id,
+    schema,
+    recursive = true,
+  }: {
+    url: string;
+    prompt: string;
+    callbackUrl: string;
+    id?: string;
+    schema?: z.ZodType<any>;
+    recursive?: boolean;
+  }) {
     const baseData = {
       url,
       prompt,
